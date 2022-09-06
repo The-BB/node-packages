@@ -1,0 +1,133 @@
+--- a/dist/bin/platforms/linux.js
++++ b/dist/bin/platforms/linux.js
+@@ -22,7 +22,7 @@ class LinuxInstaller extends base_platfo
+         return path.resolve('/etc/default', this.systemdServiceName);
+     }
+     get runPartsPath() {
+-        return path.resolve('/etc/hb-service', this.hbService.serviceName.toLowerCase(), 'prestart.d');
++        return path.resolve('/opt/etc/hb-service', this.hbService.serviceName.toLowerCase(), 'prestart.d');
+     }
+     async install() {
+         this.checkForRoot();
+@@ -102,8 +102,7 @@ class LinuxInstaller extends base_platfo
+     }
+     async beforeStart() {
+         if ([
+-            '/usr/local/lib/node_modules',
+-            '/usr/lib/node_modules'
++            '/opt/lib/node_modules'
+         ].includes(path.dirname(process.env.UIX_BASE_PATH))) {
+             setTimeout(() => {
+                 process.exit(0);
+@@ -147,7 +146,7 @@ class LinuxInstaller extends base_platfo
+                 this.hbService.logger(`Rebuilt plugins in ${process.env.UIX_CUSTOM_PLUGIN_PATH} for Node.js ${targetNodeVersion}.`, 'succeed');
+             }
+             else {
+-                const npmGlobalPath = child_process.execSync('/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
++                const npmGlobalPath = child_process.execSync('/opt/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
+                     env: Object.assign({
+                         npm_config_loglevel: 'silent',
+                         npm_update_notifier: 'false',
+@@ -397,15 +396,15 @@ class LinuxInstaller extends base_platfo
+         try {
+             const npmPath = child_process.execSync('which npm').toString('utf8').trim();
+             const shutdownPath = child_process.execSync('which shutdown').toString('utf8').trim();
+-            const sudoersEntry = `${this.hbService.asUser}    ALL=(ALL) NOPASSWD:SETENV: ${shutdownPath}, ${npmPath}, /usr/bin/npm, /usr/local/bin/npm`;
+-            const sudoers = fs.readFileSync('/etc/sudoers', 'utf-8');
++            const sudoersEntry = `${this.hbService.asUser}    ALL=(ALL) NOPASSWD:SETENV: ${shutdownPath}, ${npmPath}, /opt/bin/npm`;
++            const sudoers = fs.readFileSync('/opt/etc/sudoers', 'utf-8');
+             if (sudoers.includes(sudoersEntry)) {
+                 return;
+             }
+             child_process.execSync(`echo '${sudoersEntry}' | sudo EDITOR='tee -a' visudo`);
+         }
+         catch (e) {
+-            this.hbService.logger('WARNING: Failed to setup /etc/sudoers, you may not be able to shutdown/restart your server from the Homebridge UI.', 'warn');
++            this.hbService.logger('WARNING: Failed to setup /opt/etc/sudoers, you may not be able to shutdown/restart your server from the Homebridge UI.', 'warn');
+         }
+     }
+     isPackage() {
+@@ -439,7 +438,7 @@ class LinuxInstaller extends base_platfo
+     async createUfwRules() {
+         var _a;
+         try {
+-            const status = child_process.execSync('/bin/echo -n "$(ufw status)" 2> /dev/null').toString('utf8');
++            const status = child_process.execSync('/opt/bin/echo -n "$(ufw status)" 2> /dev/null').toString('utf8');
+             if (!status.includes('Status: active')) {
+                 return;
+             }
+@@ -459,7 +458,7 @@ class LinuxInstaller extends base_platfo
+     async createFirewallCmdRules() {
+         var _a;
+         try {
+-            const status = child_process.execSync('/bin/echo -n "$(firewall-cmd --state)" 2> /dev/null').toString('utf8');
++            const status = child_process.execSync('/opt/bin/echo -n "$(firewall-cmd --state)" 2> /dev/null').toString('utf8');
+             if (status !== 'running') {
+                 return;
+             }
+--- a/dist/main.js
++++ b/dist/main.js
+@@ -27817,7 +27817,7 @@ let TerminalService = class TerminalServ
+             return;
+         }
+         this.logger.log('Starting terminal session');
+-        const shell = await fs.pathExists('/bin/bash') ? '/bin/bash' : '/bin/sh';
++        const shell = await fs.pathExists('/opt/bin/bash') ? '/opt/bin/bash' : '/bin/sh';
+         const term = this.nodePtyService.spawn(shell, [], {
+             name: 'xterm-color',
+             cols: size.cols,
+@@ -28685,10 +28685,7 @@ let PluginsService = PluginsService_1 =
+     }
+     async isUiUpdateBundleAvailable(pluginAction) {
+         if ([
+-            '/usr/local/lib/node_modules',
+-            '/usr/lib/node_modules',
+-            '/opt/homebridge/lib/node_modules',
+-            '/var/packages/homebridge/target/app/lib/node_modules',
++            '/opt/lib/node_modules',
+         ].includes(path.dirname(process.env.UIX_BASE_PATH)) &&
+             pluginAction.name === this.configService.name &&
+             pluginAction.version !== 'latest') {
+@@ -29052,8 +29049,7 @@ let PluginsService = PluginsService_1 =
+             }
+             else {
+                 if ((os.platform() !== 'win32')) {
+-                    paths.push('/usr/local/lib/node_modules');
+-                    paths.push('/usr/lib/node_modules');
++                    paths.push('/opt/lib/node_modules');
+                 }
+                 paths.push(...this.getNpmPrefixToSearchPaths());
+             }
+@@ -29069,7 +29065,7 @@ let PluginsService = PluginsService_1 =
+             paths.push(path.join(process.env.APPDATA, 'npm/node_modules'));
+         }
+         else {
+-            paths.push(child_process.execSync('/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
++            paths.push(child_process.execSync('/opt/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
+                 env: Object.assign({
+                     npm_config_loglevel: 'silent',
+                     npm_update_notifier: 'false',
+--- a/dist/modules/plugins/plugins.service.js
++++ b/dist/modules/plugins/plugins.service.js
+@@ -415,10 +415,7 @@ let PluginsService = PluginsService_1 =
+     }
+     async isUiUpdateBundleAvailable(pluginAction) {
+         if ([
+-            '/usr/local/lib/node_modules',
+-            '/usr/lib/node_modules',
+-            '/opt/homebridge/lib/node_modules',
+-            '/var/packages/homebridge/target/app/lib/node_modules',
++            '/opt/lib/node_modules',
+         ].includes(path.dirname(process.env.UIX_BASE_PATH)) &&
+             pluginAction.name === this.configService.name &&
+             pluginAction.version !== 'latest') {
+@@ -782,8 +779,7 @@ let PluginsService = PluginsService_1 =
+             }
+             else {
+                 if ((os.platform() !== 'win32')) {
+-                    paths.push('/usr/local/lib/node_modules');
+-                    paths.push('/usr/lib/node_modules');
++                    paths.push('/opt/lib/node_modules');
+                 }
+                 paths.push(...this.getNpmPrefixToSearchPaths());
+             }
