@@ -19,6 +19,7 @@ rm -rf ./feeds/packages/lang/node-*
 ./scripts/feeds install -a -p nodejs
 ```
 4. Патчим:
+
 лень победила разум ;)
 ```
 patch -p1 -d . < ./feeds/nodejs/fix-interpreters.patch
