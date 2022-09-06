@@ -1,0 +1,18 @@
+diff --git a/include/package-ipkg.mk b/include/package-ipkg.mk
+index 3acd50c7..495505d0 100644
+--- a/include/package-ipkg.mk
++++ b/include/package-ipkg.mk
+@@ -208,6 +208,13 @@ $(_endef)
+ 	$(if $(Package/$(1)/install-overlay),mkdir -p $(PACKAGE_DIR) $$(IDIR_$(1))/rootfs-overlay)
+ 	$(call Package/$(1)/install-overlay,$$(IDIR_$(1))/rootfs-overlay)
+ 	-find $$(IDIR_$(1)) -name 'CVS' -o -name '.svn' -o -name '.#*' -o -name '*~'| $(XARGS) rm -rf
++	-find $$(IDIR_$(1)) -type f -exec $(SED) \
++		's,^#!.*bash,#!/opt/bin/bash,' -e \
++		's,^#!.*node$$$$,#!/opt/bin/node,' -e \
++		's,^#!.*perl,#!/opt/bin/perl,' -e \
++		's,^#!.*python,#!/opt/bin/python,' -e \
++		's,^#!.*ruby,#!/opt/bin/ruby,' -e \
++		's,^#!.*env sh,#!/bin/sh,' {} +
+ 	@( \
+ 		find $$(IDIR_$(1)) -name lib\*.so\* -or -name \*.ko | awk -F/ '{ print $$$$NF }'; \
+ 		for file in $$(patsubst %,$(PKG_INFO_DIR)/%.provides,$$(IDEPEND_$(1))); do \
