@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# fix HOME
+export HOME="/opt/root"
+
+HB=homebridge
+HBHOME=/opt/share/homebridge
+LOG=/opt/var/log/homebridge.log
+
+hb_status()
+{
+    [ -n "$(pidof $HB)" ]
+}
+
+case "$1" in
+
+    start)
+        if hb_status
+        then
+            echo "$HB already running."
+            exit 1
+        else
+            echo "Starting $HB..."
+            touch $LOG
+            $HB -U $HBHOME >> $LOG 2>&1 &
+        fi
+    ;;
+
+    stop)
+        if hb_status
+        then
+            echo "Stopping $HB..."
+            killall -SIGINT $HB
+            sleep 3
+        else
+            echo "$HB is not running."
+        fi
+    ;;
+
+    restart)
+        echo "Restarting $HB..."
+        $0 stop
+        sleep 3
+        $0 start
+    ;;
+
+    status)
+        if hb_status
+        then
+            echo "$HB already running."
+        else
+            echo "$HB is not running."
+        fi
+    ;;
+
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+    ;;
+esac

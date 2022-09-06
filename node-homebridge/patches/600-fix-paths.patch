@@ -1,0 +1,21 @@
+--- a/lib/pluginManager.js
++++ b/lib/pluginManager.js
+@@ -350,8 +350,7 @@ class PluginManager {
+         else {
+             // Default paths for non-windows systems
+             if (process.platform !== "win32") {
+-                this.searchPaths.add("/usr/local/lib/node_modules");
+-                this.searchPaths.add("/usr/lib/node_modules");
++                this.searchPaths.add("/opt/lib/node_modules");
+             }
+             this.addNpmPrefixToSearchPaths();
+         }
+@@ -361,7 +360,7 @@ class PluginManager {
+             this.searchPaths.add(path_1.default.join(process.env.APPDATA, "npm/node_modules"));
+         }
+         else {
+-            this.searchPaths.add((0, child_process_1.execSync)("/bin/echo -n \"$(npm --no-update-notifier -g prefix)/lib/node_modules\"").toString("utf8"));
++            this.searchPaths.add((0, child_process_1.execSync)("/opt/bin/echo -n \"$(npm --no-update-notifier -g prefix)/lib/node_modules\"").toString("utf8"));
+         }
+     }
+ }
