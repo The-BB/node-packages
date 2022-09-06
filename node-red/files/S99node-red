@@ -1,0 +1,42 @@
+#!/bin/sh
+
+LOG=/opt/var/log/node-red.log
+
+#Load up node red when called
+case "$1" in
+
+start)
+    if pgrep -o node-red > /dev/null
+    then
+        echo "Node-RED already running."
+        exit 1
+    else
+        echo "Starting Node-Red.."
+        touch $LOG
+        echo "" >> $LOG
+        echo "Node-RED service start: "$(date) >> $LOG
+        node-red -v -u /opt/lib/node_modules/node-red >> $LOG &
+        echo "Logging to " >> $LOG
+    fi
+;;
+
+stop)
+        echo "Stopping Node-Red.."
+        killall -SIGINT node-red 
+        sleep 3
+        echo "" >> $LOG
+        echo "Node-RED service stop: "$(date) >> $LOG
+;;
+
+restart)
+        echo "Restarting Node-Red.."
+        $0 stop
+        sleep 3
+        $0 start
+        echo "Restarted."
+;;
+
+*)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
