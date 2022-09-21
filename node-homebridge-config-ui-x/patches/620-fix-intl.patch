@@ -2,7 +2,7 @@
 +++ b/dist/main.js
 @@ -1,3 +1,6 @@
 +var Intl = require('intl');
-+console.log(new Intl.NumberFormat("en-US").format(12345678));
++//console.log(new Intl.NumberFormat("en-US").format(12345678));
 +
  /******/ (() => { // webpackBootstrap
  /******/ 	var __webpack_modules__ = ({
