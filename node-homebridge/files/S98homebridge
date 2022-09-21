@@ -1,15 +1,17 @@
 #!/bin/sh
 
-# fix HOME
+export PATH="$PATH"
 export HOME="/opt/root"
+export UIX_CONFIG_PATH="/opt/share/homebridge/config.json"
+export UIX_STORAGE_PATH="/opt/share/homebridge"
 
-HB=homebridge
-HBHOME=/opt/share/homebridge
-LOG=/opt/var/log/homebridge.log
+HB_BIN="homebridge"
+HB_HOME="/opt/share/homebridge"
+HB_LOG="/opt/var/log/homebridge.log"
 
 hb_status()
 {
-    [ -n "$(pidof $HB)" ]
+    [ -n "$(pidof $HB_BIN)" ]
 }
 
 case "$1" in
@@ -17,28 +19,28 @@ case "$1" in
     start)
         if hb_status
         then
-            echo "$HB already running."
+            echo "$HB_BIN already running."
             exit 1
         else
-            echo "Starting $HB..."
-            touch $LOG
-            $HB -U $HBHOME >> $LOG 2>&1 &
+            echo "Starting $HB_BIN..."
+            touch $HB_LOG
+            $HB_BIN -U $HB_HOME >> $HB_LOG 2>&1 &
         fi
     ;;
 
     stop)
         if hb_status
         then
-            echo "Stopping $HB..."
-            killall -SIGINT $HB
+            echo "Stopping $HB_BIN..."
+            killall -SIGINT $HB_BIN
             sleep 3
         else
-            echo "$HB is not running."
+            echo "$HB_BIN is not running."
         fi
     ;;
 
     restart)
-        echo "Restarting $HB..."
+        echo "Restarting $HB_BIN..."
         $0 stop
         sleep 3
         $0 start
@@ -47,9 +49,9 @@ case "$1" in
     status)
         if hb_status
         then
-            echo "$HB already running."
+            echo "$HB_BIN already running."
         else
-            echo "$HB is not running."
+            echo "$HB_BIN is not running."
         fi
     ;;
 

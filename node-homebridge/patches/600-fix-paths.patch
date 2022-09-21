@@ -15,7 +15,7 @@
          }
          else {
 -            this.searchPaths.add((0, child_process_1.execSync)("/bin/echo -n \"$(npm --no-update-notifier -g prefix)/lib/node_modules\"").toString("utf8"));
-+            this.searchPaths.add((0, child_process_1.execSync)("/opt/bin/echo -n \"$(npm --no-update-notifier -g prefix)/lib/node_modules\"").toString("utf8"));
++            this.searchPaths.add((0, child_process_1.execSync)("/opt/bin/echo -n \"/opt/lib/node_modules\"").toString("utf8"));
          }
      }
  }
