@@ -1,35 +1,27 @@
 # node-packages
-based on https://github.com/nxhack/openwrt-node-packages
-(see README.md.orig)
+based on https://github.com/nxhack/openwrt-node-packages (see README.md.orig)
 
-0. Читаем и выполняем [Compile packages from sources](https://github.com/Entware/Entware/wiki/Compile-packages-from-sources)
+0. Читаем и выполняем [Compile packages from sources](https://github.com/Entware/Entware/wiki/Compile-packages-from-sources). 
 
-1. Добавляем:
+1. Добавляем фид в конфиг:
 ```
 echo 'src-git-full nodejs https://github.com/The-BB/node-packages.git' >> feeds.conf
 ```
-2. Удаляем:
-```
-rm -rf ./feeds/packages/lang/node-*
-```
-3. Обновляем:
+2. Обновляем фид:
 ```
 ./scripts/feeds update nodejs
-
+```
+3. Подготавливаем к работе (создаём копии и патчим):
+```
+sh ./feeds/nodejs/backup-recover.sh backup
+```
+4. Добавляем пакеты из фида:
+```
 ./scripts/feeds install -a -p nodejs
 ```
-4. Патчим:
+5. Собираем пакеты...
 
-лень победила разум ;)
+6. Перед обновлением фидов восстанавливаем:
 ```
-patch -p1 -d . < ./feeds/nodejs/fix-interpreters.patch
+sh ./feeds/nodejs/backup-recover.sh recovery
 ```
-зависимость
-```
-patch -p1 -d ./feeds/packages < ./feeds/nodejs/openzwave.patch
-```
-5. Запускаем:
-```
-make menuconfig
-```
-...
