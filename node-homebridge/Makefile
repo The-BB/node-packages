@@ -6,12 +6,12 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=homebridge
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=1.5.0
-PKG_RELEASE:=2
+PKG_VERSION:=1.6.0
+PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://registry.npmjs.org/$(PKG_NPM_NAME)/-/
-PKG_HASH:=55af6017cc4e65708798fce394280b17f78b7a9cd1f161d942262de7f001cdb8
+PKG_HASH:=969b84ef86d62f6f9500466b6fc2ba2cda503bbe33e86fe357761f2ffee4ebfd
 
 PKG_BUILD_DEPENDS:=node/host
 PKG_USE_MIPS16:=0
@@ -54,8 +54,8 @@ define Build/Compile
 	npm_config_cache=$(TMP_DIR)/npm-cache-$(TMPNPM) \
 	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(TMPNPM) \
 	npm install --production --global-style --no-save --omit=dev --no-package-lock
-	rm -f $(PKG_BUILD_DIR)/node_modules/hap-nodejs/node_modules/put/test/c/ftoi
-	rm -f $(PKG_BUILD_DIR)/node_modules/hap-nodejs/node_modules/put/test/c/itof
+	rm -f $(PKG_BUILD_DIR)/node_modules/hap-nodejs/node_modules/@homebridge/put/test/c/ftoi
+	rm -f $(PKG_BUILD_DIR)/node_modules/hap-nodejs/node_modules/@homebridge/put/test/c/itof
 	rm -rf $(TMP_DIR)/npm-tmp-$(TMPNPM)
 	rm -rf $(TMP_DIR)/npm-cache-$(TMPNPM)
 	rm -f $(PKG_BUILD_DIR)/node_modules/.package-lock.json
