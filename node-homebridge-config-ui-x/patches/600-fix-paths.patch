@@ -11,7 +11,7 @@
                  this.storagePath = path.resolve(os.homedir(), `.${this.serviceName.toLowerCase()}`);
 --- a/dist/main.js
 +++ b/dist/main.js
-@@ -27817,7 +27817,7 @@ let TerminalService = class TerminalServ
+@@ -27837,7 +27837,7 @@ let TerminalService = class TerminalServ
              return;
          }
          this.logger.log('Starting terminal session');
@@ -20,7 +20,7 @@
          const term = this.nodePtyService.spawn(shell, [], {
              name: 'xterm-color',
              cols: size.cols,
-@@ -28685,10 +28685,7 @@ let PluginsService = PluginsService_1 =
+@@ -28705,10 +28705,7 @@ let PluginsService = PluginsService_1 =
      }
      async isUiUpdateBundleAvailable(pluginAction) {
          if ([
@@ -32,7 +32,7 @@
          ].includes(path.dirname(process.env.UIX_BASE_PATH)) &&
              pluginAction.name === this.configService.name &&
              pluginAction.version !== 'latest') {
-@@ -29052,8 +29049,7 @@ let PluginsService = PluginsService_1 =
+@@ -29072,8 +29069,7 @@ let PluginsService = PluginsService_1 =
              }
              else {
                  if ((os.platform() !== 'win32')) {
@@ -42,7 +42,7 @@
                  }
                  paths.push(...this.getNpmPrefixToSearchPaths());
              }
-@@ -29069,7 +29065,7 @@ let PluginsService = PluginsService_1 =
+@@ -29089,7 +29085,7 @@ let PluginsService = PluginsService_1 =
              paths.push(path.join(process.env.APPDATA, 'npm/node_modules'));
          }
          else {
