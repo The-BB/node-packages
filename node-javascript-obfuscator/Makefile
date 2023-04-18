@@ -6,12 +6,12 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=javascript-obfuscator
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=4.0.0
+PKG_VERSION:=4.0.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://registry.npmjs.org/$(PKG_NPM_NAME)/-/
-PKG_HASH:=eb80944941319ab05bdf0b9e8d1aad6d9b7212dd730d4fe31be4a03f9a439c0d
+PKG_HASH:=a7da0955ad965f750bf828eed8b820f8fec38c6658751355445138548f8222be
 
 PKG_MAINTAINER:=Zbynek Kocur <zbynek.kocur@fel.cvut.cz>
 PKG_LICENSE:=BSD-2-Clause
@@ -46,6 +46,7 @@ TAR_CMD=$(HOST_TAR) -C $(1) $(TAR_OPTIONS)
 NODEJS_CPU:=$(subst powerpc,ppc,$(subst aarch64,arm64,$(subst x86_64,x64,$(subst i386,ia32,$(ARCH)))))
 TMPNPM:=$(shell mktemp -u XXXXXXXXXX)
 HOSTTMPNPM:=$(shell mktemp -u XXXXXXXXXX)
+NPM_CACHE_DIR:=$(if $(call qstrip,$(CONFIG_NODEJS_NPM_CACHE_DIR)),$(call qstrip,$(CONFIG_NODEJS_NPM_CACHE_DIR)),$(TMP_DIR))
 
 TARGET_CFLAGS+=$(FPIC)
 TARGET_CPPFLAGS+=$(FPIC)
@@ -55,9 +56,9 @@ define Build/Compile
 	$(MAKE_VARS) \
 	$(MAKE_FLAGS) \
 	npm_config_nodedir=$(STAGING_DIR)/opt/ \
-	npm_config_cache=$(TMP_DIR)/npm-cache-$(TMPNPM) \
+	$(if $(CONFIG_NODEJS_NPM_KEEP_CACHE), npm_config_cache=$(NPM_CACHE_DIR)/npm-cache-$(PKG_NPM_NAME),npm_config_cache=$(TMP_DIR)/npm-cache-$(TMPNPM)) \
 	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(TMPNPM) \
-	npm install --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts --legacy-peer-deps
+	npm install --prefer-offline --no-audit --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts --legacy-peer-deps
 	rm -rf $(TMP_DIR)/npm-tmp-$(TMPNPM)
 	rm -rf $(TMP_DIR)/npm-cache-$(TMPNPM)
 	rm -f $(PKG_BUILD_DIR)/node_modules/.package-lock.json
@@ -88,9 +89,9 @@ define Host/Compile
 	cd $(HOST_BUILD_DIR); \
 	$(HOST_MAKE_VARS) \
 	npm_config_nodedir=$(STAGING_DIR)/opt/ \
-	npm_config_cache=$(TMP_DIR)/npm-cache-$(HOSTTMPNPM) \
+	$(if $(CONFIG_NODEJS_NPM_KEEP_CACHE), npm_config_cache=$(NPM_CACHE_DIR)/host-npm-cache-$(PKG_NPM_NAME),npm_config_cache=$(TMP_DIR)/npm-cache-$(HOSTTMPNPM)) \
 	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(HOSTTMPNPM) \
-	npm install --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts --legacy-peer-deps
+	npm install --prefer-offline --no-audit --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts --legacy-peer-deps
 	rm -rf $(TMP_DIR)/npm-tmp-$(HOSTTMPNPM)
 	rm -rf $(TMP_DIR)/npm-cache-$(HOSTTMPNPM)
 	rm -f $(HOST_BUILD_DIR)/node_modules/.package-lock.json
