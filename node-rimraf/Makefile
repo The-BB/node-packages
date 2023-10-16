@@ -6,12 +6,12 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=rimraf
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=5.0.0
+PKG_VERSION:=5.0.5
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://registry.npmjs.org/$(PKG_NPM_NAME)/-/
-PKG_HASH:=fe0a830335db00036058b6533bd82f3851bed5f593946c9442d35abba520b30c
+PKG_HASH:=363c10967147d8b4f6179ef4c708f8d3ac587d48d3dcba7aaec3a83d9dc6ec8b
 
 PKG_MAINTAINER:=Hirokazu MORIKAWA <morikw2@gmail.com>
 PKG_LICENSE:=ISC
@@ -22,7 +22,7 @@ HOST_BUILD_PARALLEL:=1
 
 PKG_BUILD_DEPENDS:=node/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
@@ -57,9 +57,7 @@ define Build/Compile
 	$(MAKE_FLAGS) \
 	npm_config_nodedir=$(STAGING_DIR)/opt/ \
 	$(if $(CONFIG_NODEJS_NPM_KEEP_CACHE), npm_config_cache=$(NPM_CACHE_DIR)/npm-cache-$(PKG_NPM_NAME),npm_config_cache=$(TMP_DIR)/npm-cache-$(TMPNPM)) \
-	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(TMPNPM) \
-	npm install --prefer-offline --no-audit --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts
-	rm -rf $(TMP_DIR)/npm-tmp-$(TMPNPM)
+	npm install --prefer-offline --no-audit --global-style --install-strategy=shallow --no-save --omit=dev --no-package-lock --ignore-scripts
 	rm -rf $(TMP_DIR)/npm-cache-$(TMPNPM)
 	rm -f $(PKG_BUILD_DIR)/node_modules/.package-lock.json
 	find $(PKG_BUILD_DIR)/node_modules -type d -empty -print0 | xargs -0 rmdir || true
@@ -71,10 +69,10 @@ define Package/node-rimraf/install
 		$(1)/opt/lib/node/$(PKG_NPM_NAME)/
 	$(CP) $(PKG_BUILD_DIR)/*.md \
 		$(1)/opt/lib/node/$(PKG_NPM_NAME)/
-	$(CP) $(PKG_BUILD_DIR)/dist \
+	$(CP) $(PKG_BUILD_DIR)/{node_modules,dist} \
 		$(1)/opt/lib/node/$(PKG_NPM_NAME)/
 	$(INSTALL_DIR) $(1)/opt/bin
-	$(LN) ../lib/node/$(PKG_NPM_NAME)/bin.js $(1)/opt/bin/rimraf
+	$(LN) ../lib/node/$(PKG_NPM_NAME)/dist/cjs/src/bin.js $(1)/opt/bin/rimraf
 	$(INSTALL_DIR) $(1)/opt/lib/node_modules
 	$(LN) ../node/$(PKG_NPM_NAME) $(1)/opt/lib/node_modules/$(PKG_NPM_NAME)
 endef
@@ -90,9 +88,7 @@ define Host/Compile
 	$(HOST_MAKE_VARS) \
 	npm_config_nodedir=$(STAGING_DIR)/opt/ \
 	$(if $(CONFIG_NODEJS_NPM_KEEP_CACHE), npm_config_cache=$(NPM_CACHE_DIR)/host-npm-cache-$(PKG_NPM_NAME),npm_config_cache=$(TMP_DIR)/npm-cache-$(HOSTTMPNPM)) \
-	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(HOSTTMPNPM) \
-	npm install --prefer-offline --no-audit --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts
-	rm -rf $(TMP_DIR)/npm-tmp-$(HOSTTMPNPM)
+	npm install --prefer-offline --no-audit --global-style --install-strategy=shallow --no-save --omit=dev --no-package-lock --ignore-scripts
 	rm -rf $(TMP_DIR)/npm-cache-$(HOSTTMPNPM)
 	rm -f $(HOST_BUILD_DIR)/node_modules/.package-lock.json
 	find $(HOST_BUILD_DIR)/node_modules -type d -empty -print0 | xargs -0 rmdir || true
@@ -104,10 +100,10 @@ define Host/Install
 		$(1)/lib/node_modules/$(PKG_NPM_NAME)/
 	$(CP) $(HOST_BUILD_DIR)/*.md \
 		$(1)/lib/node_modules/$(PKG_NPM_NAME)/
-	$(CP) $(HOST_BUILD_DIR)/dist \
+	$(CP) $(HOST_BUILD_DIR)/{node_modules,dist} \
 		$(1)/lib/node_modules/$(PKG_NPM_NAME)/
 	$(INSTALL_DIR) $(1)/bin
-	$(LN) ../lib/node_modules/$(PKG_NPM_NAME)/bin.js $(1)/bin/rimraf
+	$(LN) ../lib/node_modules/$(PKG_NPM_NAME)/dist/cjs/src/bin.js $(1)/bin/rimraf
 endef
 
 $(eval $(call HostBuild))
