@@ -1,0 +1,14 @@
+--- a/fuse-bindings.cc
++++ b/fuse-bindings.cc
+@@ -1333,7 +1333,11 @@ NAN_METHOD(Unmount) {
+ 
+ void Init(v8::Local<v8::Object> exports) {
+ 
++#ifdef __MIPSEB__
++  v8::Local<v8::Context> context = exports->CreationContext();
++#else
+   v8::Local<v8::Context> context = exports->GetCreationContext().ToLocalChecked();
++#endif
+ 
+   exports->Set(context, Nan::New("setCallback").ToLocalChecked(), Nan::New<FunctionTemplate>(SetCallback)->GetFunction(context).ToLocalChecked());
+   exports->Set(context, Nan::New("setBuffer").ToLocalChecked(), Nan::New<FunctionTemplate>(SetBuffer)->GetFunction(context).ToLocalChecked());
