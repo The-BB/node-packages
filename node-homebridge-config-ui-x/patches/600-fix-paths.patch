@@ -1,6 +1,6 @@
 --- a/dist/bin/hb-service.js
 +++ b/dist/bin/hb-service.js
-@@ -176,7 +176,7 @@ class HomebridgeServiceHelper {
+@@ -182,7 +182,7 @@ class HomebridgeServiceHelper {
          }
          if (!this.storagePath) {
              if (os.platform() === 'linux' || os.platform() === 'freebsd') {
@@ -11,7 +11,7 @@
                  this.storagePath = path.resolve(os.homedir(), `.${this.serviceName.toLowerCase()}`);
 --- a/dist/main.js
 +++ b/dist/main.js
-@@ -27837,7 +27837,7 @@ let TerminalService = class TerminalServ
+@@ -27839,7 +27839,7 @@ let TerminalService = class TerminalServ
              return;
          }
          this.logger.log('Starting terminal session');
@@ -20,7 +20,7 @@
          const term = this.nodePtyService.spawn(shell, [], {
              name: 'xterm-color',
              cols: size.cols,
-@@ -28705,10 +28705,7 @@ let PluginsService = PluginsService_1 =
+@@ -28707,10 +28707,7 @@ let PluginsService = PluginsService_1 =
      }
      async isUiUpdateBundleAvailable(pluginAction) {
          if ([
@@ -32,7 +32,7 @@
          ].includes(path.dirname(process.env.UIX_BASE_PATH)) &&
              pluginAction.name === this.configService.name &&
              pluginAction.version !== 'latest') {
-@@ -29072,8 +29069,7 @@ let PluginsService = PluginsService_1 =
+@@ -29074,8 +29071,7 @@ let PluginsService = PluginsService_1 =
              }
              else {
                  if ((os.platform() !== 'win32')) {
@@ -42,12 +42,12 @@
                  }
                  paths.push(...this.getNpmPrefixToSearchPaths());
              }
-@@ -29089,7 +29085,7 @@ let PluginsService = PluginsService_1 =
+@@ -29091,7 +29087,7 @@ let PluginsService = PluginsService_1 =
              paths.push(path.join(process.env.APPDATA, 'npm/node_modules'));
          }
          else {
 -            paths.push(child_process.execSync('/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
-+            paths.push(child_process.execSync('/opt/bin/echo -n "/opt/lib/node_modules"', {
++            paths.push(child_process.execSync('/opt/lib/node_modules', {
                  env: Object.assign({
                      npm_config_loglevel: 'silent',
                      npm_update_notifier: 'false',
@@ -91,7 +91,7 @@
          }
          else {
 -            paths.push(child_process.execSync('/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
-+            paths.push(child_process.execSync('/opt/bin/echo -n "/opt/lib/node_modules"', {
++            paths.push(child_process.execSync('/opt/lib/node_modules', {
                  env: Object.assign({
                      npm_config_loglevel: 'silent',
                      npm_update_notifier: 'false',

@@ -9,7 +9,7 @@
  
 --- a/package.json
 +++ b/package.json
-@@ -71,6 +71,7 @@
+@@ -73,6 +73,7 @@
      "dayjs": "1.11.4",
      "fastify": "4.3.0",
      "fs-extra": "10.1.0",
