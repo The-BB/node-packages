@@ -6,12 +6,12 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=azure-iot-device-mqtt
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=1.16.2
+PKG_VERSION:=1.16.3
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://registry.npmjs.org/$(PKG_NPM_NAME)/-/
-PKG_HASH:=9d42038bf5554b59e866a0ecc0f499c062b01a76df925146a1e73f174ea1e578
+PKG_HASH:=9f440c1b70fc61004654ea2febaa428baada8b9e79d51d65f096c0c60f38a4b5
 
 PKG_MAINTAINER:=Hirokazu MORIKAWA <morikw2@gmail.com>
 PKG_LICENSE:=MIT
@@ -19,7 +19,7 @@ PKG_LICENSE_FILES:=
 
 PKG_BUILD_DEPENDS:=node/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -52,9 +52,7 @@ define Build/Compile
 	$(MAKE_FLAGS) \
 	npm_config_nodedir=$(STAGING_DIR)/opt/ \
 	$(if $(CONFIG_NODEJS_NPM_KEEP_CACHE), npm_config_cache=$(NPM_CACHE_DIR)/npm-cache-$(PKG_NPM_NAME),npm_config_cache=$(TMP_DIR)/npm-cache-$(TMPNPM)) \
-	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(TMPNPM) \
-	npm install --prefer-offline --no-audit --production --global-style --no-save --omit=dev --no-package-lock
-	rm -rf $(TMP_DIR)/npm-tmp-$(TMPNPM)
+	npm install --prefer-offline --no-audit --global-style --install-strategy=shallow --no-save --omit=dev --no-package-lock
 	rm -rf $(TMP_DIR)/npm-cache-$(TMPNPM)
 	rm -f $(PKG_BUILD_DIR)/node_modules/.package-lock.json
 	find $(PKG_BUILD_DIR)/node_modules -type d -empty -print0 | xargs -0 rmdir || true
