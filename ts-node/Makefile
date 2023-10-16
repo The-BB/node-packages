@@ -7,7 +7,7 @@ include $(TOPDIR)/rules.mk
 PKG_NPM_NAME:=ts-node
 PKG_NAME:=$(PKG_NPM_NAME)
 PKG_VERSION:=10.9.1
-PKG_RELEASE:=1
+PKG_RELEASE:=2
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://registry.npmjs.org/$(PKG_NPM_NAME)/-/
@@ -19,7 +19,7 @@ PKG_LICENSE_FILES:=LICENSE
 
 PKG_BUILD_DEPENDS:=node/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -53,9 +53,7 @@ define Build/Compile
 	$(MAKE_FLAGS) \
 	npm_config_nodedir=$(STAGING_DIR)/opt/ \
 	$(if $(CONFIG_NODEJS_NPM_KEEP_CACHE), npm_config_cache=$(NPM_CACHE_DIR)/npm-cache-$(PKG_NPM_NAME),npm_config_cache=$(TMP_DIR)/npm-cache-$(TMPNPM)) \
-	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(TMPNPM) \
-	npm install --prefer-offline --no-audit --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts
-	rm -rf $(TMP_DIR)/npm-tmp-$(TMPNPM)
+	npm install --prefer-offline --no-audit --global-style --install-strategy=shallow --no-save --omit=dev --no-package-lock --ignore-scripts
 	rm -rf $(TMP_DIR)/npm-cache-$(TMPNPM)
 	rm -f $(PKG_BUILD_DIR)/node_modules/.package-lock.json
 	find $(PKG_BUILD_DIR)/node_modules -type d -empty -delete || true
@@ -77,6 +75,11 @@ define Package/ts-node/install
 	$(LN) ../lib/node/$(PKG_NPM_NAME)/dist/bin-transpile.js $(1)/opt/bin/ts-node-transpile-only
 	$(INSTALL_DIR) $(1)/opt/lib/node_modules
 	$(LN) ../node/$(PKG_NPM_NAME) $(1)/opt/lib/node_modules/$(PKG_NPM_NAME)
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/dist/bin.js
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/dist/bin-script-deprecated.js
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/dist/bin-script.js
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/dist/bin-cwd.js
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/dist/bin-transpile.js
 endef
 
 define Package/ts-node/postrm
