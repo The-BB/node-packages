@@ -6,12 +6,12 @@ include $(TOPDIR)/rules.mk
 
 PKG_NPM_NAME:=mqtt
 PKG_NAME:=node-$(PKG_NPM_NAME)
-PKG_VERSION:=4.3.7
+PKG_VERSION:=5.1.2
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NPM_NAME)-$(PKG_VERSION).tgz
 PKG_SOURCE_URL:=https://registry.npmjs.org/$(PKG_NPM_NAME)/-/
-PKG_HASH:=50c6114205a0ed0d0ec19568ca4e98c827fff4b14f85aa45aae346090489e2dc
+PKG_HASH:=d7c79e5abfa8065d781259a868a77f0e726183fb146c630ec86fe09bc59c5a60
 
 PKG_MAINTAINER:=Hirokazu MORIKAWA <morikw2@gmail.com>
 PKG_LICENSE:=MIT
@@ -19,7 +19,7 @@ PKG_LICENSE_FILES:=LICENSE.md
 
 PKG_BUILD_DEPENDS:=node/host
 PKG_BUILD_PARALLEL:=1
-PKG_USE_MIPS16:=0
+PKG_BUILD_FLAGS:=no-mips16
 
 include $(INCLUDE_DIR)/package.mk
 
@@ -52,9 +52,7 @@ define Build/Compile
 	$(MAKE_FLAGS) \
 	npm_config_nodedir=$(STAGING_DIR)/opt/ \
 	$(if $(CONFIG_NODEJS_NPM_KEEP_CACHE), npm_config_cache=$(NPM_CACHE_DIR)/npm-cache-$(PKG_NPM_NAME),npm_config_cache=$(TMP_DIR)/npm-cache-$(TMPNPM)) \
-	npm_config_tmp=$(TMP_DIR)/npm-tmp-$(TMPNPM) \
-	npm install --prefer-offline --no-audit --production --global-style --no-save --omit=dev --no-package-lock --ignore-scripts
-	rm -rf $(TMP_DIR)/npm-tmp-$(TMPNPM)
+	npm install --prefer-offline --no-audit --global-style --install-strategy=shallow --no-save --omit=dev --no-package-lock --ignore-scripts
 	rm -rf $(TMP_DIR)/npm-cache-$(TMPNPM)
 	rm -f $(PKG_BUILD_DIR)/node_modules/.package-lock.json
 	find $(PKG_BUILD_DIR)/node_modules -type d -empty -delete || true
@@ -62,21 +60,21 @@ endef
 
 define Package/node-mqtt/install
 	$(INSTALL_DIR) $(1)/opt/lib/node/$(PKG_NPM_NAME)
-	$(CP) $(PKG_BUILD_DIR)/{package.json,*.md,*.js} \
+	$(CP) $(PKG_BUILD_DIR)/{package.json,*.md} \
 		$(1)/opt/lib/node/$(PKG_NPM_NAME)/
-	$(CP) $(PKG_BUILD_DIR)/{node_modules,lib} \
+	$(CP) $(PKG_BUILD_DIR)/{node_modules,build} \
 		$(1)/opt/lib/node/$(PKG_NPM_NAME)/
-	$(CP) $(PKG_BUILD_DIR)/{bin,dist,doc} \
+	$(CP) $(PKG_BUILD_DIR)/{build,dist,help} \
 		$(1)/opt/lib/node/$(PKG_NPM_NAME)/
 	$(INSTALL_DIR) $(1)/opt/bin
-	$(LN) ../lib/node/$(PKG_NPM_NAME)/mqtt.js $(1)/opt/bin/mqtt
-	$(LN) ../lib/node/$(PKG_NPM_NAME)/bin/pub.js $(1)/opt/bin/mqtt_pub
-	$(LN) ../lib/node/$(PKG_NPM_NAME)/bin/sub.js $(1)/opt/bin/mqtt_sub
+	$(LN) ../lib/node/$(PKG_NPM_NAME)/build/bin/mqtt.js $(1)/opt/bin/mqtt
+	$(LN) ../lib/node/$(PKG_NPM_NAME)/build/bin/pub.js $(1)/opt/bin/mqtt_pub
+	$(LN) ../lib/node/$(PKG_NPM_NAME)/build/bin/sub.js $(1)/opt/bin/mqtt_sub
 	$(INSTALL_DIR) $(1)/opt/lib/node_modules
 	$(LN) ../node/$(PKG_NPM_NAME) $(1)/opt/lib/node_modules/$(PKG_NPM_NAME)
-	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/mqtt.js
-	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/bin/pub.js
-	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/bin/sub.js
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/build/bin/mqtt.js
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/build/bin/pub.js
+	chmod +x $(1)/opt/lib/node/$(PKG_NPM_NAME)/build/bin/sub.js
 endef
 
 define Package/node-mqtt/postrm
