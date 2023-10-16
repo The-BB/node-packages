@@ -1,17 +1,17 @@
-From 1481a372f5323234329546235d835037bf8390bd Mon Sep 17 00:00:00 2001
+From 5ea3e2830171cb7cd8572279e399939ecb1eb130 Mon Sep 17 00:00:00 2001
 From: The-BB <tun.chen.bo@gmail.com>
-Date: Sun, 11 Dec 2022 12:13:46 +0300
+Date: Mon, 16 Oct 2023 11:23:52 +0300
 Subject: [PATCH] include/package-ipkg.mk: autofix exec path in scripts
 
 ---
- include/package-ipkg.mk | 7 +++++++
- 1 file changed, 7 insertions(+)
+ include/package-ipkg.mk | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/include/package-ipkg.mk b/include/package-ipkg.mk
-index 3acd50c7..962d8182 100644
+index 3acd50c7..3983b81f 100644
 --- a/include/package-ipkg.mk
 +++ b/include/package-ipkg.mk
-@@ -208,6 +208,13 @@ $(_endef)
+@@ -208,6 +208,14 @@ $(_endef)
  	$(if $(Package/$(1)/install-overlay),mkdir -p $(PACKAGE_DIR) $$(IDIR_$(1))/rootfs-overlay)
  	$(call Package/$(1)/install-overlay,$$(IDIR_$(1))/rootfs-overlay)
  	-find $$(IDIR_$(1)) -name 'CVS' -o -name '.svn' -o -name '.#*' -o -name '*~'| $(XARGS) rm -rf
@@ -22,6 +22,7 @@ index 3acd50c7..962d8182 100644
 +		's,^#!.*python,#!/opt/bin/python,' -e \
 +		's,^#!.*ruby,#!/opt/bin/ruby,' -e \
 +		's,^#!.*env sh,#!/bin/sh,' {} +
++	-find $$(IDIR_$(1)) -type f -name \*.map -delete
  	@( \
  		find $$(IDIR_$(1)) -name lib\*.so\* -or -name \*.ko | awk -F/ '{ print $$$$NF }'; \
  		for file in $$(patsubst %,$(PKG_INFO_DIR)/%.provides,$$(IDEPEND_$(1))); do \
