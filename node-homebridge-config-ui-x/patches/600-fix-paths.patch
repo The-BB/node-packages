@@ -47,7 +47,7 @@
          }
          else {
 -            paths.push(child_process.execSync('/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
-+            paths.push(child_process.execSync('/opt/lib/node_modules', {
++            paths.push(child_process.execSync('/opt/bin/echo -n "/opt/lib/node_modules"', {
                  env: Object.assign({
                      npm_config_loglevel: 'silent',
                      npm_update_notifier: 'false',
@@ -91,7 +91,7 @@
          }
          else {
 -            paths.push(child_process.execSync('/bin/echo -n "$(npm -g prefix)/lib/node_modules"', {
-+            paths.push(child_process.execSync('/opt/lib/node_modules', {
++            paths.push(child_process.execSync('/opt/bin/echo -n "/opt/lib/node_modules"', {
                  env: Object.assign({
                      npm_config_loglevel: 'silent',
                      npm_update_notifier: 'false',

@@ -52,7 +52,7 @@ define Package/node-homebridge-config-ui-x/description
               "restart": "/opt/etc/init.d/S98homebridge restart",
               "log": {
                 "method": "file",
-                "command": "/opt/var/log/homebridge.log"
+                "path": "/opt/var/log/homebridge.log"
               },
               "platform": "config"
             }
